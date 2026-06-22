@@ -1,0 +1,8 @@
+name = "lisselot-mar-landing"
+compatibility_date = "2026-06-19"
+pages_build_output_dir = "."
+
+[[d1_databases]]
+binding = "DB"
+database_name = "lisselot-bookings"
+database_id = "REPLACE_WITH_YOUR_D1_DATABASE_ID"

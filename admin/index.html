@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Panel | Lisselot Mar</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/admin/admin.css" />
+  </head>
+  <body class="admin-page">
+    <main class="admin-shell">
+      <section class="admin-header">
+        <a class="brand brand--admin" href="/" aria-label="Volver a Lisselot Mar">
+          <img src="/assets/lisselot-mar-logo.png" alt="Lisselot Mar" />
+        </a>
+        <div>
+          <p class="section-kicker">Panel privado</p>
+          <h1>Bandeja y contenido</h1>
+          <p>Gestiona solicitudes, textos de la landing e imágenes de la galería desde un solo lugar.</p>
+        </div>
+      </section>
+
+      <section class="admin-login" id="loginPanel">
+        <label>
+          Clave de administrador
+          <input id="adminToken" type="password" autocomplete="current-password" placeholder="Clave privada del panel" />
+        </label>
+        <button class="button button--primary" id="saveToken" type="button">Entrar al panel</button>
+        <p>En local la clave inicial es <strong>lisselot-admin</strong>. En producción se cambia con `ADMIN_PASSWORD`.</p>
+      </section>
+
+      <section class="admin-workspace" id="adminWorkspace" hidden>
+        <div class="admin-tabs" role="tablist" aria-label="Secciones del panel">
+          <button class="admin-tab is-active" type="button" data-tab="inbox">Solicitudes</button>
+          <button class="admin-tab" type="button" data-tab="content">Textos</button>
+          <button class="admin-tab" type="button" data-tab="gallery">Galería</button>
+          <button class="admin-tab admin-tab--ghost" id="logout" type="button">Salir</button>
+        </div>
+
+        <p class="admin-status" id="adminStatus" role="status" aria-live="polite"></p>
+
+        <section class="admin-panel is-active" id="panel-inbox">
+          <div class="admin-tools">
+            <div class="admin-filters">
+              <label>
+                Buscar
+                <input id="searchInput" type="search" placeholder="Nombre, teléfono, email, lugar..." />
+              </label>
+              <label>
+                Estado
+                <select id="statusFilter">
+                  <option value="">Todos</option>
+                  <option value="nuevo">Nuevo</option>
+                  <option value="contactado">Contactado</option>
+                  <option value="cotizado">Cotizado</option>
+                  <option value="archivado">Archivado</option>
+                </select>
+              </label>
+            </div>
+            <div class="admin-actions">
+              <button class="button button--ghost" id="refreshRequests" type="button">Actualizar</button>
+              <button class="button button--ghost" id="exportCsv" type="button">Exportar CSV</button>
+            </div>
+          </div>
+
+          <div class="requests-table-wrap">
+            <table class="requests-table" aria-label="Solicitudes recibidas">
+              <thead>
+                <tr>
+                  <th>Cliente</th>
+                  <th>Evento</th>
+                  <th>Fecha</th>
+                  <th>Lugar</th>
+                  <th>Formato</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="requestsTable"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="admin-panel" id="panel-content">
+          <div class="editor-card">
+            <div>
+              <p class="section-kicker">Editor de textos</p>
+              <h2>Contenido de la landing</h2>
+              <p>Actualiza titulares, descripciones, bloques de venta y footer sin tocar código.</p>
+            </div>
+            <form class="content-form" id="contentForm"></form>
+            <div class="admin-actions admin-actions--left">
+              <button class="button button--primary" id="saveContent" type="button">Guardar textos</button>
+              <a class="button button--ghost" href="/" target="_blank" rel="noopener">Ver landing</a>
+            </div>
+          </div>
+        </section>
+
+        <section class="admin-panel" id="panel-gallery">
+          <div class="editor-card">
+            <div>
+              <p class="section-kicker">Galería</p>
+              <h2>Imágenes publicadas</h2>
+              <p>Agrega nuevas fotos y elimina las que ya no quieras mostrar. La grilla conserva el diseño actual.</p>
+            </div>
+
+            <form class="gallery-upload" id="galleryUpload">
+              <label>
+                Imagen
+                <input id="galleryFile" type="file" accept="image/png,image/jpeg,image/webp" required />
+              </label>
+              <label>
+                Texto alternativo
+                <input id="galleryAlt" type="text" placeholder="Descripción breve de la imagen" />
+              </label>
+              <button class="button button--primary" type="submit">Añadir a galería</button>
+            </form>
+
+            <div class="gallery-admin-grid" id="galleryAdminGrid" aria-label="Imágenes de galería"></div>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <script src="/admin/admin.js"></script>
+  </body>
+</html>
