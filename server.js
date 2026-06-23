@@ -10,10 +10,17 @@ const PORT = Number(process.env.PORT || 5173);
 const HOST = process.env.HOST || "0.0.0.0";
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "lisselot-admin";
 const PERSISTENT_DIR = process.env.PERSISTENT_DIR || ROOT;
-const DATA_DIR = process.env.DATA_DIR || path.join(PERSISTENT_DIR, "data");
-const REQUESTS_FILE = path.join(DATA_DIR, "requests.json");
-const CONTENT_FILE = path.join(DATA_DIR, "content.json");
-const UPLOAD_DIR = process.env.UPLOAD_DIR || path.join(PERSISTENT_DIR, "uploads", "gallery");
+let DATA_DIR = process.env.DATA_DIR || path.join(PERSISTENT_DIR, "data");
+let REQUESTS_FILE = path.join(DATA_DIR, "requests.json");
+let CONTENT_FILE = path.join(DATA_DIR, "content.json");
+let UPLOAD_DIR = process.env.UPLOAD_DIR || path.join(PERSISTENT_DIR, "uploads", "gallery");
+
+const configureStorage = (baseDir) => {
+  DATA_DIR = process.env.DATA_DIR || path.join(baseDir, "data");
+  REQUESTS_FILE = path.join(DATA_DIR, "requests.json");
+  CONTENT_FILE = path.join(DATA_DIR, "content.json");
+  UPLOAD_DIR = process.env.UPLOAD_DIR || path.join(baseDir, "uploads", "gallery");
+};
 
 const JSON_HEADERS = {
   "content-type": "application/json; charset=utf-8",
@@ -157,8 +164,22 @@ const defaultContent = () => ({
 });
 
 const ensureStorage = async () => {
-  await fsp.mkdir(DATA_DIR, { recursive: true });
-  await fsp.mkdir(UPLOAD_DIR, { recursive: true });
+  try {
+    await fsp.mkdir(DATA_DIR, { recursive: true });
+    await fsp.mkdir(UPLOAD_DIR, { recursive: true });
+  } catch (error) {
+    if (process.env.PERSISTENT_DIR && !process.env.DATA_DIR && !process.env.UPLOAD_DIR) {
+      console.warn(
+        `No se pudo usar PERSISTENT_DIR=${process.env.PERSISTENT_DIR}. ` +
+          "Usando almacenamiento local temporal del proyecto."
+      );
+      configureStorage(ROOT);
+      await fsp.mkdir(DATA_DIR, { recursive: true });
+      await fsp.mkdir(UPLOAD_DIR, { recursive: true });
+    } else {
+      throw error;
+    }
+  }
 
   if (!fs.existsSync(REQUESTS_FILE)) {
     await writeJson(REQUESTS_FILE, []);
@@ -549,6 +570,8 @@ ensureStorage().then(() => {
   server.listen(PORT, HOST, () => {
     console.log(`Lisselot Mar listo en http://127.0.0.1:${PORT}`);
     console.log(`Panel admin: http://127.0.0.1:${PORT}/admin/`);
-    console.log(`Clave admin local: ${ADMIN_PASSWORD}`);
+    console.log(`Clave admin configurada: ${process.env.ADMIN_PASSWORD ? "variable ADMIN_PASSWORD" : "clave local por defecto"}`);
+    console.log(`Solicitudes guardadas en: ${REQUESTS_FILE}`);
+    console.log(`Imagenes subidas en: ${UPLOAD_DIR}`);
   });
 });
